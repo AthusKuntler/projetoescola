@@ -16,27 +16,24 @@ async function conectarBluetooth() {
         });
 
         const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(
+            "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
+        );
+        characteristic = await service.getCharacteristic(
+            "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
+        );
 
-        const service =
-            await server.getPrimaryService(
-                "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
-            );
+        // Atualiza status visual após conexão bem-sucedida
+        document.getElementById("statusDot").classList.add("connected");
+        document.getElementById("statusText").textContent = "micro:bit conectado";
 
-        characteristic =
-            await service.getCharacteristic(
-                "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
-            );
-
-        alert("Micro:bit conectado!");
     } catch (erro) {
         alert("Erro ao conectar");
     }
 }
 
 function analisarIA(texto) {
-
     let score = 0;
-
     texto = texto.toUpperCase();
 
     const suspeitas = [
@@ -56,52 +53,40 @@ function analisarIA(texto) {
     const exclamacoes = (texto.match(/!/g) || []).length;
     score += exclamacoes * 3;
 
-    if (texto.length < 60)
-        score += 15;
-
-    if (!/\d/.test(texto))
-        score += 10;
-
-    if (!texto.includes("FONTE"))
-        score += 10;
+    if (texto.length < 60) score += 15;
+    if (!/\d/.test(texto)) score += 10;
+    if (!texto.includes("FONTE")) score += 10;
 
     return score;
 }
 
 async function enviar(msg) {
     const encoder = new TextEncoder();
-
-    await characteristic.writeValue(
-        encoder.encode(msg + "\n")
-    );
+    await characteristic.writeValue(encoder.encode(msg + "\n"));
 }
 
 async function analisar() {
-
     if (!characteristic) {
         alert("Conecte o micro:bit primeiro");
         return;
     }
 
-    const texto =
-        document.getElementById("texto").value;
-
+    const texto = document.getElementById("texto").value;
     const score = analisarIA(texto);
 
     let resultado = "";
+    if (score >= 60)      resultado = "RED";
+    else if (score >= 30) resultado = "YELLOW";
+    else                  resultado = "GREEN";
 
-    if (score >= 60)
-        resultado = "RED";
-    else if (score >= 30)
-        resultado = "YELLOW";
-    else
-        resultado = "GREEN";
+    // Aplica classe para cor e exibe texto legível
+    const el = document.getElementById("resultado");
+    el.className = resultado;
+    el.innerText = resultado === "GREEN"  ? "✓ CONFIÁVEL"
+                 : resultado === "YELLOW" ? "⚠ SUSPEITO"
+                 :                         "✗ DESINFORMAÇÃO";
 
-    document.getElementById("resultado")
-        .innerText = resultado;
-
-    document.getElementById("score")
-        .innerText = "Pontuação: " + score;
+    document.getElementById("score").innerText = "Pontuação: " + score;
 
     await enviar(resultado);
 }
