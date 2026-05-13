@@ -4,29 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detector Inteligente</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="container">
+    <div class="header">
+        <div class="header-icon">🔍</div>
+        <div>
+            <h1>Detector Inteligente</h1>
+            <div class="subtitle">VeriBot · Análise de Desinformação</div>
+        </div>
+    </div>
 
-    <h1>Detector Inteligente</h1>
+    <div class="input-area">
+        <span class="label">// Texto para análise</span>
+        <textarea id="texto" placeholder="Cole ou digite uma notícia aqui..."></textarea>
+    </div>
 
-    <button id="connectBtn">Conectar Micro:bit</button>
+    <div class="btn-group">
+        <button id="connectBtn">⚡ Micro:bit</button>
+        <button id="analyzeBtn">▶ Analisar Notícia</button>
+    </div>
 
-    <textarea
-        id="texto"
-        placeholder="Digite ou cole uma notícia aqui...">
-    </textarea>
+    <span class="label">// Resultado</span>
+    <div class="result-panel">
+        <div id="resultado">—</div>
+        <div id="score"></div>
+    </div>
 
-    <button id="analyzeBtn">Analisar</button>
-
-    <div id="resultado"></div>
-    <div id="score"></div>
-
+    <div class="status">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">micro:bit desconectado</span>
+    </div>
 </div>
-
 <script src="app.js"></script>
-
 </body>
 </html>
